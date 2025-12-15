@@ -2,6 +2,9 @@ import express from 'express'
 import multer from 'multer'
 import path from 'path'
 import mysql from 'mysql2/promise'
+import dotenv from 'dotenv'
+dotenv.config()
+
 
 const app = express()
 
@@ -38,25 +41,21 @@ const upload=multer({storage})
 
 
 
-app.post("/upload",upload.single('profile'),(req,res)=>{
-    console.log(req.body)
-    console.log(req.file)
+app.post("/upload", upload.single("profile"), async (req, res) => {
+  try {
+    const filepath = req.file.path
+    const filename = req.file.filename
 
-    const filepath=req.file.path
-    const filename=req.file.filename
-
-    conn.query("Insert into uploads(file_name,file_path) values (?,?)",[filename,filepath],
-        (err,result)=>{
-            if(err){
-                console.log(err)
-                 return res.send("Error")
-            }
-            else{
-                console.log("Svaed in DB")
-               
-            }
-        }
+    await conn.query(
+      "INSERT INTO uploads (file_name, file_path) VALUES (?, ?)",
+      [filename, filepath]
     )
+
+    res.send("File uploaded & saved 🫶")
+  } catch (err) {
+    console.error(err)
+    res.status(500).send("DB error")
+  }
 })
 
 
