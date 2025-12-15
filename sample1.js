@@ -10,10 +10,11 @@ app.use(express.json())
 app.set("view engine", "ejs");
 
 const conn = mysql.createPool({
- host: "localhost",
-  user: "root",
-  password: "admin",
-  database: "db"
+ host: process.env.DB_HOST || '127.0.0.1',
+  port: Number(process.env.DB_PORT || 3306),
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PWD || '',
+  database: process.env.DB_NAME || 'db'
 });
 
 
